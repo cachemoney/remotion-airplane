@@ -1,62 +1,37 @@
-import {staticFile} from 'remotion';
-import {getVideoMetadata, VideoMetadata} from '@remotion/media-utils';
-import {ThreeCanvas, useVideoTexture} from '@remotion/three';
-import React, {useEffect, useRef, useState} from 'react';
-import {AbsoluteFill, useVideoConfig, Video} from 'remotion';
-import {Phone} from './Phone';
-import {z} from 'zod';
-import {zColor} from '@remotion/zod-types';
+import {ThreeCanvas} from '@remotion/three';
+import {AbsoluteFill, useVideoConfig} from 'remotion';
+import { Airplane } from './components/Airplane';
+import { Float } from '@react-three/drei';
+import { Background } from './components/Background';
 
-const container: React.CSSProperties = {
-	backgroundColor: 'white',
-};
 
-const videoStyle: React.CSSProperties = {
-	position: 'absolute',
-	opacity: 0,
-};
 
-export const myCompSchema = z.object({
-	phoneColor: zColor(),
-	deviceType: z.enum(['phone', 'tablet']),
-});
+export const Scene = () => {
+	const { width, height} = useVideoConfig();
 
-type MyCompSchemaType = z.infer<typeof myCompSchema>;
-
-export const Scene: React.FC<
-	{
-		baseScale: number;
-	} & MyCompSchemaType
-> = ({baseScale, phoneColor, deviceType}) => {
-	const videoRef = useRef<HTMLVideoElement>(null);
-	const {width, height} = useVideoConfig();
-	const [videoData, setVideoData] = useState<VideoMetadata | null>(null);
-
-	const videoSrc =
-		deviceType === 'phone' ? staticFile('phone.mp4') : staticFile('tablet.mp4');
-
-	useEffect(() => {
-		getVideoMetadata(videoSrc)
-			.then((data) => setVideoData(data))
-			.catch((err) => console.log(err));
-	}, [videoSrc]);
-
-	const texture = useVideoTexture(videoRef);
 	return (
-		<AbsoluteFill style={container}>
-			<Video ref={videoRef} src={videoSrc} style={videoStyle} />
-			{videoData ? (
-				<ThreeCanvas linear width={width} height={height}>
-					<ambientLight intensity={1.5} color={0xffffff} />
-					<pointLight position={[10, 10, 0]} />
-					<Phone
-						phoneColor={phoneColor}
-						baseScale={baseScale}
-						videoTexture={texture}
-						aspectRatio={videoData.aspectRatio}
-					/>
-				</ThreeCanvas>
-			) : null}
-		</AbsoluteFill>
+    <AbsoluteFill >
+    <ThreeCanvas
+      orthographic={false}
+      width={width}
+      height={height}
+      frameloop='never'
+      style={{
+        backgroundColor: '#ececec',
+      }}
+      camera={{ fov: 30, position: [0, 0, 5] }}
+    >
+      <Background />
+      <Float floatIntensity={2} speed={2}>
+        <Airplane
+          rotation-y={Math.PI / 2}
+          scale={[0.2, 0.2, 0.2]}
+          position-y={0.1}
+        />
+      </Float>
+      
+    </ThreeCanvas>
+
+  </AbsoluteFill>
 	);
 };
