@@ -8,7 +8,10 @@ import { Background } from "./Background";
 
 export function CameraGroup(props) {
   const { width, height} = useVideoConfig();
-	const frame = useCurrentFrame();
+	
+  // Code below drops fps to ~10, when commented out
+  // However moves fps back to 30.
+  const frame = useCurrentFrame();
 	
 	
 	const cameraGroup = useRef<THREE.Group>(null!);
