@@ -22,36 +22,35 @@ type GLTFResult = GLTF & {
 const model = staticFile("/models/airplane/model.glb");
 
 export function Airplane(props) {
-  const { advance } = useThree();
-  const frame = useCurrentFrame();
+	const {advance} = useThree();
+	const frame = useCurrentFrame();
 
-  useEffect(() => {
-    if (helix.current) {
-      helix.current.rotation.x += HELIX_SPEED;
-    }
-  
+	useEffect(() => {
+		if (helix.current) {
+			helix.current.rotation.x = frame * HELIX_SPEED;
+		}
+
 		advance(frame);
-	},[frame]);
-  
-  const { nodes, materials } = useGLTF(model) as GLTFResult;
+	}, [advance, frame]);
 
-  const helix = useRef<Mesh>(null!);
+	const {nodes, materials} = useGLTF(model) as GLTFResult;
 
-  return (
-    <group {...props} dispose={null}>
-      <mesh
-        geometry={nodes.PUSHILIN_Plane_Circle000.geometry}
-        material={materials.plane}
-      />
-      <mesh
-        ref={helix}
-        geometry={nodes.PUSHILIN_Plane_Helix.geometry}
-        material={materials.plane}
-        position={[1.09, 0.23, 0]}
-      />
-    </group>
-  );
+	const helix = useRef<Mesh>(null!);
 
+	return (
+		<group {...props} dispose={null}>
+			<mesh
+				geometry={nodes.PUSHILIN_Plane_Circle000.geometry}
+				material={materials.plane}
+			/>
+			<mesh
+				ref={helix}
+				geometry={nodes.PUSHILIN_Plane_Helix.geometry}
+				material={materials.plane}
+				position={[1.09, 0.23, 0]}
+			/>
+		</group>
+	);
 }
 
 useGLTF.preload(model);
